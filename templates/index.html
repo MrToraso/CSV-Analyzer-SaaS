@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Torasoft CSV Analyzer</title>
+
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="box compact" id="mainBox">
+
+  <div class="header">
+    <h1>CSV Analyzer</h1>
+    <p>Upload a CSV and instantly visualize your data</p>
+  </div>
+
+  <div id="dropzone" class="dropzone">
+    <div class="upload-icon">⬆</div>
+    <h3>Drop your CSV here</h3>
+    <p>or <span>browse files</span></p>
+    <input type="file" id="file" hidden>
+  </div>
+
+  <div id="file-status" class="file-status"></div>
+
+  <button onclick="analyzeCSV()">Analyze Data</button>
+
+  <div id="loading" class="loading"></div>
+
+  <div id="stats-cards" class="stats-cards"></div>
+
+  <div id="preview"></div>
+
+  <canvas id="chart"></canvas>
+
+  <div class="brand">Torasoft Analytics</div>
+
+</div>
+
+<script>
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("file");
+
+let selectedFile = null;
+let chart = null;
+
+/* ========= EXPAND BOX ========= */
+function expandBox(){
+  const box = document.getElementById("mainBox");
+  box.classList.remove("compact");
+  box.classList.add("expanded");
+}
+
+/* ========= DRAG & DROP ========= */
+
+dropzone.addEventListener("click", () => fileInput.click());
+
+fileInput.addEventListener("change", e => {
+  selectedFile = e.target.files[0];
+  previewCSV(selectedFile);
+});
+
+dropzone.addEventListener("dragover", e => {
+  e.preventDefault();
+  dropzone.classList.add("dragover");
+  dropzone.querySelector("h3").innerText = "Drop to upload";
+});
+
+dropzone.addEventListener("dragleave", () => {
+  dropzone.classList.remove("dragover");
+  dropzone.querySelector("h3").innerText = "Drop your CSV here";
+});
+
+dropzone.addEventListener("drop", e => {
+  e.preventDefault();
+
+  dropzone.classList.remove("dragover");
+  dropzone.querySelector("h3").innerText = "File ready ✔";
+
+  selectedFile = e.dataTransfer.files[0];
+
+  previewCSV(selectedFile);
+});
+
+/* ========= PREVIEW ========= */
+
+function previewCSV(file){
+
+  if(!file) return;
+
+  expandBox();
+
+  document.getElementById("file-status").innerText =
+    "File loaded: " + file.name;
+
+  const reader = new FileReader();
+
+  reader.onload = e => {
+    const lines = e.target.result
+      .split("\n")
+      .slice(0,5);
+
+    document.getElementById("preview").innerHTML =
+      "<b>Preview:</b><br>" + lines.join("<br>");
+  };
+
+  reader.readAsText(file);
+}
+
+/* ========= ANALYZE ========= */
+
+async function analyzeCSV(){
+
+  if(!selectedFile){
+    alert("Upload a CSV first");
+    return;
+  }
+
+  expandBox();
+
+  document.getElementById("loading").innerText =
+    "> analyzing data...";
+
+  const formData = new FormData();
+  formData.append("file", selectedFile);
+
+  const res = await fetch("/analyze", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+
+  if(data.error){
+    document.getElementById("loading").innerText = "";
+    return;
+  }
+
+  document.getElementById("loading").innerText =
+    "Analysis complete ✔";
+
+  renderStats(data);
+  drawChart(data);
+}
+
+/* ========= STATS ========= */
+
+function renderStats(data){
+
+  document.getElementById("stats-cards").innerHTML = `
+    <div class="stat-card">
+      <h4>Columns</h4>
+      <p>${data.columns.length}</p>
+    </div>
+
+    <div class="stat-card">
+      <h4>Max Value</h4>
+      <p>${Math.max(...data.max).toFixed(1)}</p>
+    </div>
+
+    <div class="stat-card">
+      <h4>Min Value</h4>
+      <p>${Math.min(...data.min).toFixed(1)}</p>
+    </div>
+  `;
+}
+
+/* ========= CHART ========= */
+
+function drawChart(data){
+
+  const ctx = document.getElementById("chart");
+
+  if(chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: data.columns,
+      datasets: [{
+        label: "Average Values",
+        data: data.mean
+      }]
+    }
+  });
+}
+
+</script>
+
+</body>
+</html>

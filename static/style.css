@@ -1,0 +1,197 @@
+body {
+  margin:0;
+  font-family:'Inter',Arial,sans-serif;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:40px;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* BACKGROUND IMAGE LAYER */
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    linear-gradient(rgba(255,255,255,0.82),
+                    rgba(255,255,255,0.82)),
+    url("/static/img/wallpaper_excel.jpg");
+  background-size: cover;
+  background-position: center;
+  filter: blur(2px);
+  z-index:-1;
+}
+
+
+body {
+  margin:0;
+  font-family:'Inter',Arial,sans-serif;
+  background: linear-gradient(135deg,#f8fafc,#eef2ff);
+  display:flex;
+  justify-content:center;
+  padding:40px;
+}
+
+.box {
+  width: 760px;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+
+  overflow: hidden;
+  transition: max-height .45s ease, transform .3s ease;
+}
+
+/* ESTADO INICIAL */
+.box.compact {
+  max-height: 430px;
+}
+
+/* CUANDO HAY DATOS */
+.box.expanded {
+  max-height: 1500px;
+}
+
+/* evita espacios gigantes vacíos */
+#preview,
+#stats-cards,
+canvas {
+  margin-top: 18px;
+}
+
+/* HEADER */
+.header h1 {
+  margin:0;
+  color:#111827;
+}
+
+.header p {
+  margin-top:6px;
+  color:#6b7280;
+}
+
+/* DROPZONE */
+.dropzone {
+  margin-top:20px;
+  border:2px dashed #d1d5db;
+  border-radius:16px;
+  padding:35px;
+  text-align:center;
+  background:#fafafa;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.dropzone:hover {
+  border-color:#10b981;
+  background:#f0fdf4;
+  transform: translateY(-2px);
+}
+
+.dropzone.dragover {
+  background:#dcfce7;
+  border-color:#059669;
+}
+
+.upload-icon {
+  width:52px;
+  height:52px;
+  margin:auto;
+  border-radius:12px;
+  background:linear-gradient(135deg,#10b981,#059669);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+}
+
+/* STATUS */
+.file-status {
+  margin-top:12px;
+  font-size:14px;
+  color:#374151;
+}
+
+/* BUTTON */
+button {
+  width:100%;
+  margin-top:15px;
+  padding:13px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(90deg,#10b981,#059669);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(16,185,129,.35);
+}
+
+/* LOADING */
+.loading {
+  margin-top:15px;
+  color:#6b7280;
+  font-size:14px;
+}
+
+/* STATS CARDS */
+.stats-cards {
+  margin-top:20px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
+  gap:12px;
+}
+
+.stat-card {
+  background:#f9fafb;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:14px;
+}
+
+.stat-card h4 {
+  margin:0;
+  font-size:13px;
+  color:#6b7280;
+}
+
+.stat-card p {
+  margin-top:6px;
+  font-size:20px;
+  color:#111827;
+  font-weight:600;
+}
+
+/* PREVIEW */
+#preview {
+  margin-top:18px;
+  padding:12px;
+  background:#f9fafb;
+  border-radius:10px;
+  max-height:150px;
+  overflow:auto;
+  font-size:14px;
+}
+
+/* BRAND */
+.brand {
+  position:absolute;
+  bottom:12px;
+  right:15px;
+  font-size:12px;
+  color:#9ca3af;
+}
+
+@keyframes fade{
+  from{opacity:0; transform:translateY(15px);}
+  to{opacity:1; transform:translateY(0);}
+}
